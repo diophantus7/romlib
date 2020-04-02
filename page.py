@@ -1,6 +1,6 @@
 import requests
 import re
-import urlparse
+import urllib.parse
 import json
 from collections import OrderedDict
 
@@ -9,8 +9,7 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
         
-from downloader import (DownloadHandler,
-                        LoginError)
+#from downloader import (DownloadHandler, LoginError)
 
 from utils import get_daytime
 from constants import *
@@ -139,13 +138,13 @@ class Dashboard(RomwodPage):
 #         return listing
     
     def get_dashboard_item(self, option_block):
-        parsed = urlparse.urlparse(self._url)
+        parsed = urllib.parse.urlparse(self._url)
         lparsed = list(parsed)
         lparsed[2] = option_block.a.get('href')
         lparsed[4] = 'action=list'
         item = xbmcgui.ListItem(label=option_block.h3.text)
         return FolderItem(option_block.h3.text,
-                          urlparse.urlunparse(lparsed),
+                          urllib.parse.urlunparse(lparsed),
                           option_block.img.get('src')).get_list_item()
 
     
