@@ -1,6 +1,5 @@
 import re
 import requests
-import xbmc
 import json
 
 try: 
@@ -56,5 +55,5 @@ class WistiaExtractor:
                 raise ResolveError("No video found.")
             url = max(video_data,
                       key=lambda d: int(d['display_name'].strip('p')))['url']
-            xbmc.log("Fallback to url: %s" % url)
+            #xbmc.log("Fallback to url: %s" % url)
         return url
