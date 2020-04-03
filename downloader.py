@@ -20,7 +20,7 @@ class LoginError(Exception):
         self.message = message
 
 
-class DownloadHandler:
+class DownloadHandler(object):
     
     
     def __init__(self):

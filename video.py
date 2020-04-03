@@ -2,6 +2,7 @@ import sys
 import urllib
 import re
 
+#import beautifulsoup4
 try: 
         from BeautifulSoup import BeautifulSoup
 except ImportError:
@@ -10,11 +11,10 @@ except ImportError:
 from constants import *
         
     
-class Video:
+class Video(object):
 
     def __init__(self, video_block):
-        bs = BeautifulSoup(str(video_block),
-                           convertEntities=BeautifulSoup.HTML_ENTITIES)
+        bs = BeautifulSoup(str(video_block))
         self.title = video_block['title']
         self.duration = video_block['duration_in_seconds']
         self.description = video_block['description']
@@ -35,7 +35,7 @@ class Video:
         return re.search('wistia_async_([0-9a-z]*) ', str(bs)).group(1)
 
 
-class VideoBlocksHandler:
+class VideoBlocksHandler(object):
     
     
     def __init__(self, video_blocks):

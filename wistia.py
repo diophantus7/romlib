@@ -1,3 +1,13 @@
+"""Classes specific to wistia.
+
+class Wistia contains constants specific to wistia.
+class WistiaExtractor extracts the location of the video for a given resolution.
+
+    Typical usage example:
+
+    we = WistiaExtractor(12345, '720p')
+    we.video_url()
+"""
 import re
 import requests
 import json
@@ -7,20 +17,22 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
 
-
-_JSON_URL = "http://fast.wistia.com/embed/medias/%s.json"
-_IFRAME_URL = "http://fast.wistia.net/embed/iframe/%s"
 #_IFRAME_URL = "https://embedwistia-a.akamaihd.net/deliveries/%s"
+
 
 class ResolveError(Exception):
     def __init__(self, message):
         self.message = message
+
+
+class Wistia(object):
+    JSON_URL = "http://fast.wistia.com/embed/medias/%s.json"
+    IFRAME_URL = "http://fast.wistia.net/embed/iframe/%s"
         
 
-class WistiaExtractor:
+class WistiaExtractor(object):
     
     def __init__(self, video_id, format):
-        #self.html_page = html_page
         self.video_id = video_id
         self._format = format
     
@@ -34,8 +46,8 @@ class WistiaExtractor:
     
     def _download_json(self):
         s = requests.Session()
-        s.headers.update({'referer':_IFRAME_URL % self.video_id})
-        req = s.get(_JSON_URL % self.video_id)
+        s.headers.update({'referer':Wistia.IFRAME_URL % self.video_id})
+        req = s.get(Wistia.JSON_URL % self.video_id)
         return req.json()
     
     
@@ -57,3 +69,5 @@ class WistiaExtractor:
                       key=lambda d: int(d['display_name'].strip('p')))['url']
             #xbmc.log("Fallback to url: %s" % url)
         return url
+
+

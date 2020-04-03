@@ -15,7 +15,7 @@ from utils import get_daytime
 from constants import *
 
 
-class RomwodPage:
+class RomwodPage(object):
     
     def __init__(self, url, needsLogin):
         self._url = url
