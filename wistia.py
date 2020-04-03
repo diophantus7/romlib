@@ -31,35 +31,52 @@ class Wistia(object):
         
 
 class WistiaExtractor(object):
+    """Handles the Wistia data and extracts videos.
+
+    Given a wistia video id, it downloads all the avaialable json data of the
+    video. It can retrive the url for the video for different formats.
+
+    Attributes:
+        video_id: The wistia video id of the video.
+    """
     
-    def __init__(self, video_id, format):
+    def __init__(self, video_id):
         self.video_id = video_id
-        self._format = format
+        self._json_data = self._download_json()
     
         
-    def _extract_video_id(self):
-        bs = BeautifulSoup(self.html_page)
-        video_block = json.loads(bs.find('div', {'data-react-class':'VideoView'})['data-react-props'])
-        return video_block['video']['external_id']
-        #return re.search('wistia_async_([0-9a-z]*) ', str(bs)).group(1)
-    
-    
     def _download_json(self):
+        """Returns the json data of the video after downloading it."""
         s = requests.Session()
         s.headers.update({'referer':Wistia.IFRAME_URL % self.video_id})
         req = s.get(Wistia.JSON_URL % self.video_id)
         return req.json()
     
     
-    def get_video_url(self):
+    def get_video_url(self, format):
+        """gets the video url
+
+        Retrieves the url of the wistia video with the video id self.video_id
+        with the specified format.
+
+        Args:
+            format: A possible format of the video.
+
+        Returns:
+            The URL of the video with the given format. If that video does not
+            exist return any format
+
+        Raises:
+            ResolveError: No format found in the json data
+        """
         json_data = self._download_json()
         # 17.4.2018 json_data['media']['assets'][0]['url'] is the standard today
-        return json_data['media']['assets'][0]['url']
+        #return json_data['media']['assets'][0]['url']
         try:
-            url = next(d['url'] for d in json_data['media']['unnamed_assets']
-                    if d['display_name'] == self._format and d['ext'] == 'm3u8')
+            url = next(d['url'] for d in self._json_data['media']['assets']
+                    if d['display_name'] == format and d['ext'] == 'mp4')
         except:
-            video_data = [d for d in json_data['media']['unnamed_assets']
+            video_data = [d for d in self._json_data['media']['assets']
                          if d['status'] == 2 and 'opt_vbitrate' in d
                          and 'display_name' in d and
                          'p' in d['display_name']]
@@ -67,7 +84,6 @@ class WistiaExtractor(object):
                 raise ResolveError("No video found.")
             url = max(video_data,
                       key=lambda d: int(d['display_name'].strip('p')))['url']
-            #xbmc.log("Fallback to url: %s" % url)
         return url
 
 
