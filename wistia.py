@@ -53,37 +53,21 @@ class WistiaExtractor(object):
         return req.json()
     
     
-    def get_video_url(self, format):
-        """gets the video url
+    def get_video_urls_and_formats(self):
+        """gets the video URLs and formats
 
-        Retrieves the url of the wistia video with the video id self.video_id
-        with the specified format.
-
-        Args:
-            format: A possible format of the video.
+        Retrieves the URL of the wistia videos with the video id self.video_id
+        for all formats.
 
         Returns:
-            The URL of the video with the given format. If that video does not
-            exist return any format
-
-        Raises:
-            ResolveError: No format found in the json data
+            The URLs of the video for all formats. If json data is not of the
+            regular format or no formats were found, then return None
         """
-        json_data = self._download_json()
         # 17.4.2018 json_data['media']['assets'][0]['url'] is the standard today
         #return json_data['media']['assets'][0]['url']
         try:
-            url = next(d['url'] for d in self._json_data['media']['assets']
-                    if d['display_name'] == format and d['ext'] == 'mp4')
+            return {d['display_name']:d['url'] for d in self._json_data['media']['assets'] if d['display_name'].endswith('p')}
         except:
-            video_data = [d for d in self._json_data['media']['assets']
-                         if d['status'] == 2 and 'opt_vbitrate' in d
-                         and 'display_name' in d and
-                         'p' in d['display_name']]
-            if not video_data:
-                raise ResolveError("No video found.")
-            url = max(video_data,
-                      key=lambda d: int(d['display_name'].strip('p')))['url']
-        return url
+            return None
 
 

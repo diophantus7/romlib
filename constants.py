@@ -1,11 +1,3 @@
-HOST = "app.romwod.com"
-BASE_URL = "https://app.romwod.com/"
-WORKOUTS_URL = BASE_URL + "workout/"
-WOD_URL = BASE_URL + "wod/"
-#DASHBOARD_URL = BASE_URL + "dashboard/"
-SCHEDULE_URL = BASE_URL + "all-wods/"
-#LOGIN_URL = 'https://romwod.com/members/login/'
-LOGIN_URL = BASE_URL + 'api/v1/auth/sign_in'
 
 NEXT_PAGE_LABEL = "NEXT PAGE >>>"
 SEARCH = "Search..."

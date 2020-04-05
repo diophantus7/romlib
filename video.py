@@ -1,69 +1,101 @@
+"""
+Contains the classes needed to generate a video from the html of the source
+page. The video class holds all useful information of a video.
+"""
 import sys
 import urllib
 import re
 
-#import beautifulsoup4
 try: 
         from BeautifulSoup import BeautifulSoup
 except ImportError:
         from bs4 import BeautifulSoup
         
-from constants import *
+from wistia import WistiaExtractor
+from page import RomwodConst
         
     
 class Video(object):
+    """Holds the necessary info of a romwod video.
+
+    The class holds all the info that is useful for displaying information on a
+    romwod video, like title, duration, et cetera. When referring to a video,
+    we will mean a romwod video. It also stores/extracts the location of the
+    video for different formats.
+
+    Attributes:
+        title: The title of the romwod video.
+        duration: The duration of the video in seconds.
+        description: A description of the video.
+        tags: A list containing all the tagged poses.
+        thumbnail: The link to the thumbnail of the video.
+    """
+
 
     def __init__(self, video_block):
+        """Initializes a video from a video_block.
+
+        Args:
+            video_block: A html code block containing information about the
+                video.
+        """
         bs = BeautifulSoup(str(video_block))
         self.title = video_block['title']
         self.duration = video_block['duration_in_seconds']
         self.description = video_block['description']
         self.tags = [tag['content'] for tag in video_block['poses']]
-        self.link = WORKOUTS_URL + video_block['slug']
+        self.link = RomwodConst.WORKOUTS_URL + video_block['slug']
         self.thumbnail = video_block['thumbnail']['url']
-        self.wistia_id = video_block['external_id']
+        wistia_id = video_block['external_id']
+        self._we = WistiaExtractor(wistia_id)
+        self._urls = self._we.get_video_urls_and_formats()
 
-    
-    def get_tags(self):
-        return "[CR]" + ' | '.join(["[LIGHT][I]" + tag
-                                    + "[/I][/LIGHT]" for tag in self.tags])
-    
-    
-    def _get_video_id(self, downloader):
-        video_page = downloader.get(self.link).content
-        bs = BeautifulSoup(video_page)
-        return re.search('wistia_async_([0-9a-z]*) ', str(bs)).group(1)
+    def duration_in_min(self):
+        """Returns the duration of the video in minutes."""
+        return int(divmod(self.duration, 60)[0])
+
+    def get_an_url(self):
+        """Returns the URL for the format 1080p."""
+        return self.get_url_for_format('1080p')
+
+    def get_url_for_format(self, format):
+        """Returns a dict of format and url for that format or None if no
+        format is available.
+
+        Returns:
+            An URL of the video location of the desired format. If no video is
+            avaialble for the desired format, None is returned.
+        """
+        if format in self._urls:
+            return self._urls[format]
+        else:
+            return None
+
 
 
 class VideoBlocksHandler(object):
+    """Handels the html code of all video blocks
+
+    Splits the html code of all videos into blocks for each video and then
+    creates a Video object for each block.
+    """
     
     
     def __init__(self, video_blocks):
+        """Instanciates the class.
+
+        Args:
+            video_blocks: html code of all videos on a given side.
+        """
         self._video_blocks = video_blocks
         
-        
-#     def get_video_blocks(self):
-#         """
-#         Extracts the video block from the html code as used on
-#         the romwod site
-#         
-#         :param html: str
-#         """
-#         html_parser = BeautifulSoup(self._html_code)
-#         return html_parser.body.findAll(
-#             'div', attrs={'class':re.compile(r"video-block\s.*")})
-# #         video_blocks = []
-# #         for block in blocks:
-# #             video_blocks.append(block)
-# #         return video_blocks
-    
-    
     def get_videos(self):
         """
         Extracts each html video block and instanciates
         a Video for it. Returns all videos in a list.
         
-        :param video_blocks: str
+        Returns:
+            A list of Videos for each video block of html code.
         """
         videos = []
         for vid_blk in self._video_blocks:

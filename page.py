@@ -12,7 +12,14 @@ except ImportError:
 #from downloader import (DownloadHandler, LoginError)
 
 from utils import get_daytime
-from constants import *
+
+
+class RomwodConst(object):
+    HOST = "app.romwod.com"
+    BASE_URL = "https://app.romwod.com/"
+    WORKOUTS_URL = BASE_URL + "routine/"
+    WOD_URL = BASE_URL + "wod?user_date="
+    LOGIN_URL = BASE_URL + 'signin/'
 
 
 class RomwodPage(object):
@@ -92,12 +99,6 @@ class RomwodPage(object):
             for opt in filterColumn.findAll('a'):
                 options[filterColumn.h6.text][opt['href'].split('=')[1]] = opt.text
                 
-#         node = form.div.ul.li
-#         opt_dict = OrderedDict()
-#         while node.h4 is not None:
-#             opt_dict[node.h4.text] = [(x.text, x.input['name'][2:-2])
-#                                       for x in node.findAll('li')]
-#             node = node.nextSibling
         return options
 
 
@@ -120,7 +121,7 @@ class RomwodPage(object):
 
 class Dashboard(RomwodPage):
     
-    def __init__(self, url = BASE_URL, needsLogin = False):
+    def __init__(self, url = RomwodConst.BASE_URL, needsLogin = False):
         RomwodPage.__init__(self, url, needsLogin)
         
     def get_dashboard_entries(self):
