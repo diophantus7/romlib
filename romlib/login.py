@@ -26,7 +26,7 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
         
-from page import RomwodConst
+from .constants import RomwodConst
 
 
 class LoginError(Exception):

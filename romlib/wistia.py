@@ -31,7 +31,6 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
 
-#_IFRAME_URL = "https://embedwistia-a.akamaihd.net/deliveries/%s"
 
 
 class ResolveError(Exception):

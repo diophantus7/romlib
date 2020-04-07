@@ -25,16 +25,9 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
         
-from login import (LoginHandler, LoginError)
-from utils import get_daytime
-
-
-class RomwodConst(object):
-    HOST = "app.romwod.com"
-    BASE_URL = "https://app.romwod.com/"
-    WORKOUTS_URL = BASE_URL + "routine/"
-    WOD_URL = BASE_URL + "wod?user_date="
-    LOGIN_URL = BASE_URL + 'api/v2/auth/sign_in'
+from .login import (LoginHandler, LoginError)
+from .utils import get_daytime
+from .constants import RomwodConst
 
 
 class RomwodPage(object):

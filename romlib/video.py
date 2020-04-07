@@ -25,8 +25,8 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
         
-from wistia import WistiaExtractor
-from page import RomwodConst
+from .wistia import WistiaExtractor
+from .constants import RomwodConst
         
     
 class Video(object):
