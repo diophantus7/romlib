@@ -1,3 +1,5 @@
+"""Contains classes specific to handling the content of romwod pages"""
+
 import requests
 import re
 import urllib.parse
@@ -19,15 +21,29 @@ class RomwodConst(object):
     BASE_URL = "https://app.romwod.com/"
     WORKOUTS_URL = BASE_URL + "routine/"
     WOD_URL = BASE_URL + "wod?user_date="
-    LOGIN_URL = BASE_URL + 'signin/'
+    LOGIN_URL = BASE_URL + 'api/v2/auth/sign_in'
 
 
 class RomwodPage(object):
+    """Manages the content of a romwod page.
+
+    This class manages the content of a romwod page. It can extract certain
+    elements like video_blocks with information to construct Video objects.
+
+    Attributes:
+        content: The html content of the page.
+    """
     
-    def __init__(self, url, needsLogin):
+    def __init__(self, url, needs_login=False):
+        """Construct the RomwodPage object.
+        
+        Args:
+            url: The URL of the page to get information from.
+            needs_login: Boolean indicating wheather a login is necessary to
+                view the page.
+        """
         self._url = url
-        needsLogin = False
-        if needsLogin:
+        if needs_login:
             session = DownloadHandler()
         else:
             session = requests.session()
@@ -40,6 +56,7 @@ class RomwodPage(object):
             raise LoginError("Page %s needs login." % self._url)
     
     def _redirects(self):
+        """Checks if the url redirects."""
         soup = BeautifulSoup(self._content)
         location = re.search('window\.location\s*=\s*\"([^"]+)\"', str(soup))
         if location:
@@ -48,20 +65,20 @@ class RomwodPage(object):
             return False
         
     def _is_login_page(self):
+        """Checks if the page is the login page."""
         if self._parser.findAll('div', {'id':'forgotPass'}):
             return True
         else:
             return False
   
-    def get_content(self):
+    @property
+    def content(self):
         return self._content
 
     def extract_video_blocks(self):
         """
         Extracts the video block from the html code as used on
-        the romwod site
-        
-        :param html: str
+        the romwod site.
         """
         parsed_html = BeautifulSoup(self._content)
         video_dict = self._parser.find('div', {'data-react-class':'WeeklySchedule'})
@@ -75,9 +92,7 @@ class RomwodPage(object):
     def extract_selection_form(self):
         """
         Extracts the selection form which is used to filter the workouts
-        by classes
-        
-        :param site: str
+        by classes.
         """
         bs = BeautifulSoup(self._content)
         form = bs.body.find('form',
@@ -85,11 +100,7 @@ class RomwodPage(object):
         return str(form)    
     
     def extract_options(self):
-        """
-        Extracts the options for which one can filter the workouts
-        
-        :param site: str
-        """
+        """Extracts the options for which one can filter the workouts."""
         form = BeautifulSoup(self.extract_selection_form(),
                              convertEntities=BeautifulSoup.HTML_ENTITIES)
         options = OrderedDict()
@@ -104,12 +115,9 @@ class RomwodPage(object):
 
     def next_page(self):
         """
-        Checks if the content listed on the webpage goes on for
-        several pages.
+        Checks for pagination.
         If this is the case, the next page is returned,
         otherwise None.
-        
-        :param site: str
         """
         bs = BeautifulSoup(self._content)
         next = bs.find('a', attrs={'class':'next always-show'})
@@ -120,36 +128,23 @@ class RomwodPage(object):
     
 
 class Dashboard(RomwodPage):
-    
-    def __init__(self, url = RomwodConst.BASE_URL, needsLogin = False):
-        RomwodPage.__init__(self, url, needsLogin)
-        
-    def get_dashboard_entries(self):
-#         return self._parser.find(
-#             'div', {'class':'container','id':'dash-options'}).findAll(
-#             'div', {'class':re.compile('dash-option\s')})
-        return self._parser.findAll('div', {'class':'card_inner'})
-#     
-#         listing = []
-#         
-#         if db_options is not None:
-#             for option in db_options:
-#                 listing.append(self.get_dashboard_item(option))
-#         
-#         return listing
-    
-    def get_dashboard_item(self, option_block):
-        parsed = urllib.parse.urlparse(self._url)
-        lparsed = list(parsed)
-        lparsed[2] = option_block.a.get('href')
-        lparsed[4] = 'action=list'
-        item = xbmcgui.ListItem(label=option_block.h3.text)
-        return FolderItem(option_block.h3.text,
-                          urllib.parse.urlunparse(lparsed),
-                          option_block.img.get('src')).get_list_item()
+    """The Dashboard is the main page of the romwod app.
 
+    The Dashboard class contains entries not found on other romwod pages.
+    """
     
-    def get_dashboard_fanart(self):
+    def __init__(self, url = RomwodConst.BASE_URL, needs_login = False):
+        """Inits the class."""
+        RomwodPage.__init__(self, url, needs_login)
+        
+    @property
+    def dashboard_entries(self):
+        """Returns a list of all dashboard entries."""
+        return self._parser.findAll('div', {'class':'card_inner'})
+    
+    @property
+    def dashboard_fanart(self):
+        """Returns the fanart of the dashboard depending on the daytime."""
         fanart = FANART_BASE + 'dash-bg-' + get_daytime() + '.jpg'
         return fanart
     
