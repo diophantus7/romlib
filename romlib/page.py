@@ -25,8 +25,7 @@ try:
 except ImportError:
         from bs4 import BeautifulSoup
         
-#from downloader import (DownloadHandler, LoginError)
-
+from login import (LoginHandler, LoginError)
 from utils import get_daytime
 
 
@@ -58,7 +57,7 @@ class RomwodPage(object):
         """
         self._url = url
         if needs_login:
-            session = DownloadHandler()
+            session = LoginHandler()
         else:
             session = requests.session()
         self._content = session.get(url).content
