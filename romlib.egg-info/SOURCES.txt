@@ -1,0 +1,6 @@
+setup.py
+romlib.egg-info/PKG-INFO
+romlib.egg-info/SOURCES.txt
+romlib.egg-info/dependency_links.txt
+romlib.egg-info/requires.txt
+romlib.egg-info/top_level.txt

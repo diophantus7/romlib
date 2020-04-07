@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: romlib
+Version: 0.1
+Summary: A library to scrape the romwod page
+Home-page: UNKNOWN
+Author: diophantus7
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Requires-Python: >=3.6
