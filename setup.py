@@ -22,6 +22,6 @@ setuptools.setup(
         "Intended Audience :: Developers",
     ],
     packages=setuptools.find_packages(),
-    install_requires=['beautifulsoup4', 'requests'],
+    install_requires=['beautifulsoup4', 'requests', 'lxml'],
     python_requires=">=3.6"
 )
