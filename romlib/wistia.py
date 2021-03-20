@@ -79,9 +79,10 @@ class WistiaExtractor(object):
         # 17.4.2018 json_data['media']['assets'][0]['url'] is the standard today
         #return json_data['media']['assets'][0]['url']
         urls = {}
-        for d in self._json_data['media']['assets']:
-            res = d['display_name']
-            if res.endswith('p') or res == 'Original file':
-                urls[res] = d['url']
+        if 'media' in self._json_data:
+            for d in self._json_data['media']['assets']:
+                res = d['display_name']
+                if res.endswith('p') or res == 'Original file':
+                    urls[res] = d['url']
         return urls
 
