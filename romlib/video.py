@@ -58,7 +58,8 @@ class Video(object):
         self.description = video_block['description']
         self.tags = [tag['content'] for tag in video_block['poses']]
         self.link = RomwodConst.WORKOUTS_URL + video_block['slug']
-        self.thumbnail = video_block['thumbnail']['url']
+        #self.thumbnail = video_block['thumbnail']['url']
+        self.thumbnail = video_block['shortVideo']['thumbnail']['url']
         wistia_id = video_block['shortExternalId']
         self._we = WistiaExtractor(wistia_id)
         self._urls = self._we.get_video_urls_and_formats()
