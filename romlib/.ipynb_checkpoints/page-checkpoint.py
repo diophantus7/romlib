@@ -94,7 +94,7 @@ class RomwodPage(object):
 #         else:
 #             video_dict = self._parser.find('div', {'data-react-class':'SearchGrid'})
 #             video_blocks = json.loads(json.loads(video_dict['data-react-props'])['items'])
-        return s['schedule']['scheduledWorkouts']
+        return s['schedule']['scheduledWorkouts'][2]
     
     def extract_selection_form(self):
         """
